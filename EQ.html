@@ -59,10 +59,6 @@
       <input id="eq-point" type="range" value = '200' min="100" max="2000"
       step="1" oninput="SetEQ_point(this.value)" onchange="SetEQ_point(this.value)"/>EQ-Point</input>
       <br><br><br><br><br><br><br><br><br><br><br><br>
-      <input id="eq-lowbypass" type="range" value = '0' min="0" max="200"
-      step="1" oninput="low_bypass(this.value)" onchange="low_bypass(this.value)"/>EQ-lowbypass</input>
-      <input id="eq-highbypass" type="range" value = '0' min="1000" max="20000"
-      step="1" oninput="high_bypass(this.value)" onchange="high_bypass(this.value)"/>EQ-highbypass</input>
 
 
 
@@ -117,14 +113,12 @@
         FilterHigh.gain.value = 0
         _FilterHigh = FilterHigh
 
-        FilterLowBypass.type = 'peaking'
-        FilterLowBypass.frequency.value = '0'
-        FilterLowBypass.gain.value = 0
+        FilterLowBypass.type = 'highpass'
+        FilterLowBypass.frequency.value = '100'
         _FilterLowBypass = FilterLowBypass
 
-        FilterHighBypass.type = 'peaking'
-        FilterHighBypass.frequency.value ='0'
-        FilterHighBypass.gain.value = 0
+        FilterHighBypass.type = 'lowpass'
+        FilterHighBypass.frequency.value ='16000'
         _FilterHighBypass = FilterHighBypass
       }
 
@@ -194,8 +188,9 @@
         console.log('하이'+_FilterHigh.gain.value)
         _FilterLow.gain.value= -val
         _FilterHigh.gain.value= val/2
+
         _FilterLowBypass.gain.value = val
-        _FilterHigh.gain.value= -val/2
+        _FilterHighBypass.gain.value= -val/2
 
       }
       function SetEQ_point(val)
@@ -206,13 +201,6 @@
 
       }
 
-      function low_bypass(val){
-        _FilterLowBypass.frequency.value = val
-        
-      }
-      function high_bypass(val){
-        _FilterHighBypass.frequency.value = val
-      }
 
     </script>
   </body>
