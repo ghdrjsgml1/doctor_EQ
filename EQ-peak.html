@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>exer</title>
+    <title>EQ-Peak</title>
     <style>
       body {
         padding: 3rem 1.5rem 1.5rem 1rem;
@@ -16,27 +16,34 @@
         font-size: 1.5rem;
         margin-bottom: 3rem;
       }
+      .button-group>input {
+        width: 8rem;
+        height: 3.5rem;
+        font-size: 1.5rem;
+        margin-bottom: 3rem;
+      }
       .controller{
-        margin: 4rem;
-        border: 4px;
+        margin: 2rem;
+        border: 100px;
         padding: 3rem 1.5rem 1.5rem 1rem;
         text-align:center;
         width: 1000px;
-        height: 500px;
       }
       input[type="range"]{
         /* position:absolute;
         top:50%; */
         transform: rotate(270deg);
-        margin-left : 3rem;
+        margin-left : 1rem;
       }
-      .input-knob{
-        margin : 3rem;
 
-      }
     </style>
+    <script src="input-knobs.js"></script>
+      <script>window.inputKnobsOptions={}</script>
   </head>
   <body>
+    <h1>이곳은 peakEQ입니다</h1>
+    <button><a href = 'EQ-tilt.html'>TiltEQ로 이동</button></a>
+    <br><br>
     <label for="upload-file">오디오 파일 업로드 : </label>
     <input type="file" id="upload-file" accept="audio/*">
     <br>
@@ -45,6 +52,7 @@
       <button id="btn pause", onclick="stop()">정지</button>
       <!-- <button id="volumeUp", onclick="volumeUp()">볼륨업</button>
       <button id="volumedown", onclick="volumeDown()">볼륨다운</button> -->
+
     </div>
     <br>
     <audio id="processed-audio" controls></audio>
@@ -53,18 +61,20 @@
 
       <input id="vol-control" type="range" value = '1' min="0" max="2" 
       step="0.1" oninput="SetVolume(this.value)" onchange="SetVolume(this.value)"/>Gain</input>
+
       <input id="eqgain-control" type="range" value = '0' min="-10" max="10" 
       step="1" oninput="SetEQ_gain(this.value)" onchange="SetEQ_gain(this.value)"/>EQ-Gain</input>
-      <br><br><br><br><br><br><br><br><br><br><br><br>
-      <input id="eq-point" type="range" value = '200' min="100" max="2000"
-      step="1" oninput="SetEQ_point(this.value)" onchange="SetEQ_point(this.value)"/>EQ-Point</input>
-      <br><br><br><br><br><br><br><br><br><br><br><br>
-      <input id="eq-lowbypass" type="range" value = '0' min="0" max="200"
-      step="1" oninput="low_bypass(this.value)" onchange="low_bypass(this.value)"/>EQ-lowbypass</input>
-      <input id="eq-highbypass" type="range" value = '0' min="1000" max="20000"
-      step="1" oninput="high_bypass(this.value)" onchange="high_bypass(this.value)"/>EQ-highbypass</input>
+
+      <!-- <input id="eq-Q" type="range" value = '0.001' min="1" max="2" 
+      step="0.001" oninput="SetEQ_Q(this.value)" onchange="SetEQ_Q(this.value)"/>EQ-Q</input> -->
 
 
+      <br><br><br><br><br><br><br><br><br><br><br><br>
+        <div class = "button-group">
+        <button class = 'MW' onclick ="Set_EQ_m()"/>남자</input>
+        <button class = 'MW' onclick ="Set_EQ_w()"/>여자</input>
+        <button id = "eq-default" onclick ="Set_EQ_n()"/>원본듣기</button>
+      </div>
 
     </div>
     <!-- 여기서부터 JS script -->
@@ -74,8 +84,6 @@
       let _gainNode = ''
       let _FilterLow = ''
       let _FilterHigh = ''
-      let _FilterLowBypass = ''
-      let _FilterHighBypass = ''
 
       const fileInput = document.getElementById('upload-file')
       fileInput.onchange = function (event) {
@@ -87,46 +95,38 @@
       
       function audioProcess (audioElem) {
         console.log('start audio process')
+        const Eqdefault = document.getElementById("eq-default")
+        console.log(Eqdefault.id)
         const audioCtx = new (window.AudioContext || window.webkitAudioContext) ()
-        // const audioCtx = new BaseAudioContext()
         const audioCtxSource = audioCtx.createMediaElementSource(audioElem)
         const gainNode = audioCtx.createGain()
-        gainNode.gain.value = 1
-        console.log(gainNode.gain.value)
         const FilterLow = audioCtx.createBiquadFilter()
         const FilterHigh = audioCtx.createBiquadFilter()
-        const FilterLowBypass = audioCtx.createBiquadFilter()
-        const FilterHighBypass = audioCtx.createBiquadFilter()
 
-        audioCtxSource.connect(gainNode)
-        gainNode.connect(FilterLow)
-        FilterLow.connect(FilterLowBypass)
-        FilterLowBypass.connect(FilterHigh)
-        FilterHigh.connect(FilterHighBypass)
-        FilterHighBypass.connect(audioCtx.destination)
+        gainNode.gain.value = 1
+        console.log(gainNode.gain.value)
+
 
         _gainNode = gainNode
 
-        FilterLow.type = 'lowshelf'
+        FilterLow.type = 'peaking'
         FilterLow.frequency.value = '0'
-        FilterLow.gain.value = 0
+        FilterLow.gain.value = '0'
+        FilterLow.Q.value = 3
         _FilterLow = FilterLow
 
-        FilterHigh.type = 'highshelf'
+        FilterHigh.type = 'peaking'
         FilterHigh.frequency.value = '0'
-        FilterHigh.gain.value = 0
+        FilterHigh.gain.value = '0'
+        FilterHigh.Q.value =3
         _FilterHigh = FilterHigh
 
-        FilterLowBypass.type = 'peaking'
-        FilterLowBypass.frequency.value = '0'
-        FilterLowBypass.gain.value = 0
-        _FilterLowBypass = FilterLowBypass
-
-        FilterHighBypass.type = 'peaking'
-        FilterHighBypass.frequency.value ='0'
-        FilterHighBypass.gain.value = 0
-        _FilterHighBypass = FilterHighBypass
-      }
+        audioCtxSource.connect(gainNode)
+        gainNode.connect(FilterLow)
+        FilterLow.connect(FilterHigh)
+        FilterHigh.connect(audioCtx.destination)
+  
+        }
 
       function setAudioElement (audioFile) {
         const audioElem = document.getElementById('processed-audio')
@@ -159,12 +159,14 @@
         }
         else {
             audioElem.pause()
-            button.innerText = '재생'
+            button.innerText = '재생';
         }
       }
       function stop() {
+        const button = document.body.querySelector('[id="btn play"]');
         const audioElem = setAudioElement(audioFile)
         audioElem.pause()
+        button.innerText = '재생';
       }
 
       function SetVolume(val)
@@ -174,45 +176,52 @@
           console.log('AfterGain: ' + _gainNode.gain.value);
       }
 
-      function Set_EQ_1(val)
-      {
-        console.log('BeforeHz:' + _FilterLow.frequency.value)
-        _FilterLow.frequency.value = val
-        console.log('AfterHz:' + _FilterLow.frequency.value)
+      // function Set_EQ_1(val)
+      // {
+      //   console.log('BeforeHz:' + _FilterLow.frequency.value)
+      //   _FilterLow.frequency.value = val
+      //   console.log('AfterHz:' + _FilterLow.frequency.value)
+      // }
 
-      }
-      function Set_EQ_2(val)
-      {
-        console.log('BeforeHz:' + _FilterHigh.frequency.value)
-        _FilterHigh.frequency.value = val
-        console.log('AfterHz:' + _FilterHigh.frequency.value)
+      // function Set_EQ_2(val)
+      // {
+      //   console.log('BeforeHz:' + _FilterHigh.frequency.value)
+      //   _FilterHigh.frequency.value = val
+      //   console.log('AfterHz:' + _FilterHigh.frequency.value)
+      // }
 
-      }
       function SetEQ_gain(val)
       {
         console.log('로우'+_FilterLow.gain.value)
         console.log('하이'+_FilterHigh.gain.value)
-        _FilterLow.gain.value= -val
-        _FilterHigh.gain.value= val/2
-        _FilterLowBypass.gain.value = val
-        _FilterHigh.gain.value= -val/2
-
+        _FilterLow.gain.value= val
+        _FilterHigh.gain.value= val
       }
-      function SetEQ_point(val)
+      function Set_EQ_n()        
+      {        
+        _FilterLow.frequency.value = 0
+        _FilterHigh.frequency.value = 0
+        console.log('현재 EQ포인트 : ' + _FilterLow.frequency.value)
+      }      
+
+      function Set_EQ_m()
       {
-        console.log('현재 EQ포인트 : '+ _FilterLow.frequency.value)
-        _FilterLow.frequency.value = val
-        _FilterHigh.frequency.value = val
-
+        _FilterLow.frequency.value = 480
+        _FilterHigh.frequency.value = 1435
+        console.log('현재 EQ포인트 : ' ,_FilterLow.frequency.value , _FilterHigh.frequency.value)
+      }
+      function Set_EQ_w()
+      {
+        _FilterLow.frequency.value = 590
+        _FilterHigh.frequency.value = 1595
+        console.log('현재 EQ포인트 : ' , _FilterLow.frequency.value , _FilterHigh.frequency.value)
       }
 
-      function low_bypass(val){
-        _FilterLowBypass.frequency.value = val
-        
-      }
-      function high_bypass(val){
-        _FilterHighBypass.frequency.value = val
-      }
+      // function SetEQ_Q(val){
+      //   _FilterLow.Q.value = val
+      //   _FilterHigh.Q.value = val*2
+      //   console.log('현재 Q : ' + _FilterLow.Q.value)
+      // }
 
     </script>
   </body>
