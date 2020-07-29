@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>exer</title>
+    <style>
+      body {
+        padding: 3rem 1.5rem 1.5rem 1rem;
+      }
+      #upload-file {
+        width: 15rem;
+        height: 5rem;
+      }
+      .button-group>button {
+        width: 8rem;
+        height: 3.5rem;
+        font-size: 1.5rem;
+        margin-bottom: 3rem;
+      }
+      .controller{
+        margin: 4rem;
+        border: 4px;
+        padding: 3rem 1.5rem 1.5rem 1rem;
+        text-align:center;
+        width: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <label for="upload-file">오디오 파일 업로드 : </label>
+    <input type="file" id="upload-file" accept="audio/*">
+    <br>
+    <div class="button-group">
+      <button id="btn play", onclick="play()">재생</button>
+      <button id="btn pause", onclick="stop()">정지</button>
+      <!-- <button id="volumeUp", onclick="volumeUp()">볼륨업</button>
+      <button id="volumedown", onclick="volumeDown()">볼륨다운</button> -->
+    </div>
+    <br>
+    <audio id="processed-audio" controls></audio>
+    <div class = "controller">
+      <input id="vol-control" style ="width:500px" type="range" min="0" max="2" step="0.1" oninput="SetVolume(this.value)" onchange="SetVolume(this.value)">Gain</input>
+ 
+    </div>
+    <!-- 여기서부터 JS script -->
+    <script>
+      let audioFile = ''
+      let audioSource = ''
+      let _gainNode = ''
+
+      const fileInput = document.getElementById('upload-file')
+      fileInput.onchange = function (event) {
+        const fileList = fileInput.files
+        audioFile = fileList[0]
+        clickButton()
+      }
+      
+      function audioProcess (audioElem) {
+        console.log('start audio process')
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext) ()
+        const audioCtxSource = audioCtx.createMediaElementSource(audioElem)
+        const gainNode = audioCtx.createGain()
+        gainNode.gain.value =1
+        console.log(gainNode.gain.value)
+        const connectedSource = audioCtxSource.connect(gainNode)
+        connectedSource.connect(audioCtx.destination)
+
+        _gainNode = gainNode
+
+      }
+
+      function setAudioElement (audioFile) {
+        const audioElem = document.getElementById('processed-audio')
+        if (audioElem.childNodes.length > 0) {
+          audioElem.removeChild(audioElem.childNodes[0])
+        }
+        audioElem.load()
+        const mediaURL = URL.createObjectURL(audioFile)
+        const sourceElem = document.createElement('source')
+        sourceElem.src = mediaURL
+        audioElem.appendChild(sourceElem)
+        audioElem.load()
+        URL.revokeObjectURL(audioFile)
+
+        return audioElem
+      }
+
+      function clickButton () {
+        const audioElem = setAudioElement(audioFile)
+        audioProcess(audioElem)
+      }
+      function play() {
+        const audioElem = document.getElementById('processed-audio')
+        console.log(audioElem)
+        if (audioElem.paused) {
+            audioElem.play()
+        }
+        else {
+            audioElem.pause()
+        }
+      }
+      function stop() {
+        const audioElem = setAudioElement(audioFile)
+        audioElem.pause()
+      }
+      function volumeUp(){
+        _gainNode.gain.value +=0.1
+        if(_gainNode.gain.value >2){
+          _gainNode.gain.value=2
+        }
+        console.log(_gainNode.gain.value)
+      }
+      function volumeDown(){
+        _gainNode.gain.value -=0.1
+        if(_gainNode.gain.value <0){
+          _gainNode.gain.value =0
+        }
+        console.log(_gainNode.gain.value)
+      }
+      function SetVolume(val)
+      {
+          console.log('Before: ' + _gainNode.gain.value);
+          _gainNode.gain.value = val
+          console.log('After: ' + _gainNode.gain.value);
+      }
+
+    </script>
+  </body>
+</html>
+
+

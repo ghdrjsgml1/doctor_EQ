@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>exer</title>
+    <style>
+      body {
+        padding: 3rem 1.5rem 1.5rem 1rem;
+      }
+      #upload-file {
+        width: 15rem;
+        height: 5rem;
+      }
+      .button-group>button {
+        width: 8rem;
+        height: 3.5rem;
+        font-size: 1.5rem;
+        margin-bottom: 3rem;
+      }
+    </style>
+  </head>
+  <body>
+    <label for="upload-file">오디오 파일 업로드 : </label>
+    <input type="file" id="upload-file" accept="audio/*">
+    <br>
+    <div class="button-group">
+      <button id="play" onclick="play()">재생</button>
+      <button id="up" onclick="volumeDown()">볼륨 다운</button>
+      <button id="down" onclick="volumeUp()">볼륨 업</button>
+    </div>
+    <br>
+    <audio id="audio-source" controls>
+      <source src='./test.mp3'>
+    </audio>
+    <!-- 여기서부터 JS script -->
+    <script>
+      var audio = document.getElementById("audio-source");
+      var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var source = audioCtx.createMediaElementSource(audio);
+      var gainNode = audioCtx.createGain();      
+      var gainConnected = source.connect(gainNode);
+      document.querySelector('button').addEventListener('click', function() {audioCtx.resume()})
+
+      gainConnected.connect(audioCtx.destination);
+      console.log(gainConnected)
+
+      function play() {
+          if (audio.paused) {
+              audio.play()
+          }
+          else {
+              audio.pause()
+          }          
+      }
+
+      function volumeUp() {          
+          if (gainNode.gain.value >= 2) {
+              gainNode.gain.value = 2
+          }
+          else {
+              gainNode.gain.value += 0.2
+          }
+          console.log(gainNode.gain.value)
+      }
+
+      function volumeDown() {          
+          if (gainNode.gain.value <= 0) {
+              gainNode.gain.value = 0
+          }
+          else {
+              gainNode.gain.value -= 0.2 
+          }
+          console.log(gainNode.gain.value)
+      }
+    </script>
+  </body>
+</html>
+
+
