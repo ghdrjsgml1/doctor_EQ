@@ -114,7 +114,7 @@
         _FilterLow = FilterLow
 
         FilterHigh.type = 'highshelf'
-        FilterHigh.frequency.value = '0'
+        FilterHigh.frequency.value = '20000'
         FilterHigh.gain.value = 0
         _FilterHigh = FilterHigh
 
@@ -199,7 +199,7 @@
       function Set_EQ_n()        
       {        
         _FilterLow.frequency.value = 0
-        _FilterHigh.frequency.value = 0
+        _FilterHigh.frequency.value = 20000
         console.log('현재 EQ포인트 : ' + _FilterLow.frequency.value)
       }      
 
