@@ -37,8 +37,6 @@
       }
 
     </style>
-    <script src="input-knobs.js"></script>
-      <script>window.inputKnobsOptions={}</script>
   </head>
   <body>
     <h1>이곳은 peakEQ입니다</h1>
@@ -65,8 +63,8 @@
       <input id="eqgain-control" type="range" value = '0' min="-10" max="10" 
       step="1" oninput="SetEQ_gain(this.value)" onchange="SetEQ_gain(this.value)"/>EQ-Gain</input>
 
-      <input id="eq-Q" type="range" value = '0.001' min="0.0001" max="3" 
-      step="0.0001" oninput="SetEQ_Q(this.value)" onchange="SetEQ_Q(this.value)"/>EQ-Q</input>
+      <!-- <input id="eq-Q" type="range" value = '0.001' min="0.0001" max="3" 
+      step="0.0001" oninput="SetEQ_Q(this.value)" onchange="SetEQ_Q(this.value)"/>EQ-Q</input> -->
 
 
       <br><br><br><br><br><br><br><br><br><br><br><br>
@@ -118,7 +116,7 @@
         FilterHigh.type = 'peaking'
         FilterHigh.frequency.value = '0'
         FilterHigh.gain.value = '0'
-        FilterHigh.Q.value =3
+        FilterHigh.Q.value =0.2
         _FilterHigh = FilterHigh
 
         audioCtxSource.connect(gainNode)
@@ -217,11 +215,11 @@
         console.log('현재 EQ포인트 : ' , _FilterLow.frequency.value , _FilterHigh.frequency.value)
       }
 
-      function SetEQ_Q(val){
-        _FilterLow.Q.value = val
-        _FilterHigh.Q.value = val*2
-        console.log('현재 Q : ' + _FilterLow.Q.value)
-      }
+      // function SetEQ_Q(val){
+      //   _FilterLow.Q.value = val
+      //   _FilterHigh.Q.value = val*2
+      //   console.log('현재 Q : ' + _FilterLow.Q.value)
+      // }
 
     </script>
   </body>
