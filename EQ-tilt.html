@@ -119,11 +119,11 @@
         _FilterHigh = FilterHigh
 
         FilterLowBypass.type = 'highpass'
-        FilterLowBypass.frequency.value = '100'
+        FilterLowBypass.frequency.value = '0'
         _FilterLowBypass = FilterLowBypass
 
         FilterHighBypass.type = 'lowpass'
-        FilterHighBypass.frequency.value ='16000'
+        FilterHighBypass.frequency.value ='20000'
         _FilterHighBypass = FilterHighBypass
         }
 
@@ -214,6 +214,8 @@
         _FilterLow.frequency.value = 1000
         _FilterHigh.frequency.value = 1000
         console.log('현재 EQ포인트 : ' + _FilterLow.frequency.value)
+        _FilterLowBypass.frequency.value = 100
+        _FilterHighBypass.frequency.value =16000
       }
 
     </script>
