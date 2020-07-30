@@ -64,8 +64,8 @@
       step="1" oninput="SetEQ_gain(this.value)" onchange="SetEQ_gain(this.value)"/>EQ-Gain</input>
       <br><br><br><br><br><br><br><br><br><br><br><br>
         <div class = "button-group">
-        <button class = 'MW' onclick ="Set_EQ_m()"/>남자</input>
-        <button class = 'MW' onclick ="Set_EQ_w()"/>여자</input>
+        <!-- <button class = 'MW' onclick ="Set_EQ_m()"/>남자</input> -->
+        <button class = 'MW' onclick ="Set_EQ_w()"/>EQ적용</input>
         <button id = "eq-default" onclick ="Set_EQ_n()"/>원본듣기</button>
       </div>
 
@@ -88,17 +88,23 @@
       
       function audioProcess (audioElem) {
         console.log('start audio process')
-        const Eqdefault = document.getElementById("eq-default")
-        console.log(Eqdefault.id)
         const audioCtx = new (window.AudioContext || window.webkitAudioContext) ()
+        // const audioCtx = new BaseAudioContext()
         const audioCtxSource = audioCtx.createMediaElementSource(audioElem)
         const gainNode = audioCtx.createGain()
-        const FilterLow = audioCtx.createBiquadFilter()
-        const FilterHigh = audioCtx.createBiquadFilter()
-
         gainNode.gain.value = 1
         console.log(gainNode.gain.value)
+        const FilterLow = audioCtx.createBiquadFilter()
+        const FilterHigh = audioCtx.createBiquadFilter()
+        const FilterLowBypass = audioCtx.createBiquadFilter()
+        const FilterHighBypass = audioCtx.createBiquadFilter()
 
+        audioCtxSource.connect(gainNode)
+        gainNode.connect(FilterLow)
+        FilterLow.connect(FilterLowBypass)
+        FilterLowBypass.connect(FilterHigh)
+        FilterHigh.connect(FilterHighBypass)
+        FilterHighBypass.connect(audioCtx.destination)
 
         _gainNode = gainNode
 
@@ -112,11 +118,13 @@
         FilterHigh.gain.value = 0
         _FilterHigh = FilterHigh
 
-        audioCtxSource.connect(gainNode)
-        gainNode.connect(FilterLow)
-        FilterLow.connect(FilterHigh)
-        FilterHigh.connect(audioCtx.destination)
-  
+        FilterLowBypass.type = 'highpass'
+        FilterLowBypass.frequency.value = '100'
+        _FilterLowBypass = FilterLowBypass
+
+        FilterHighBypass.type = 'lowpass'
+        FilterHighBypass.frequency.value ='16000'
+        _FilterHighBypass = FilterHighBypass
         }
 
       function setAudioElement (audioFile) {
@@ -195,12 +203,12 @@
         console.log('현재 EQ포인트 : ' + _FilterLow.frequency.value)
       }      
 
-      function Set_EQ_m()
-      {
-        _FilterLow.frequency.value = 200
-        _FilterHigh.frequency.value = 200
-        console.log('현재 EQ포인트 : ' + _FilterLow.frequency.value)
-      }
+      // function Set_EQ_m()
+      // {
+      //   _FilterLow.frequency.value = 200
+      //   _FilterHigh.frequency.value = 200
+      //   console.log('현재 EQ포인트 : ' + _FilterLow.frequency.value)
+      // }
       function Set_EQ_w()
       {
         _FilterLow.frequency.value = 1000
